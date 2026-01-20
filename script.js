@@ -5,24 +5,25 @@ const size = 5;
 const boardSize = 500;
 const pieceSize = boardSize / size;
 
-let dragged = null;
+let draggedPiece = null;
 
-// поле
+// створюємо поле
 for (let i = 0; i < size * size; i++) {
   const slot = document.createElement("div");
   slot.className = "slot";
 
   slot.addEventListener("dragover", e => e.preventDefault());
+
   slot.addEventListener("drop", () => {
-    if (!slot.firstChild && dragged) {
-      slot.appendChild(dragged);
+    if (!slot.firstChild && draggedPiece) {
+      slot.appendChild(draggedPiece);
     }
   });
 
   board.appendChild(slot);
 }
 
-// частини
+// створюємо частини
 const pieces = [];
 
 for (let i = 0; i < size * size; i++) {
@@ -32,11 +33,10 @@ for (let i = 0; i < size * size; i++) {
 
   const x = (i % size) * -pieceSize;
   const y = Math.floor(i / size) * -pieceSize;
-
   piece.style.backgroundPosition = `${x}px ${y}px`;
 
   piece.addEventListener("dragstart", () => {
-    dragged = piece;
+    draggedPiece = piece;
   });
 
   pieces.push(piece);
