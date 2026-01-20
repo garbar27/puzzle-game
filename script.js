@@ -1,13 +1,13 @@
 const board = document.getElementById("board");
 const piecesContainer = document.getElementById("pieces");
 
-const size = 4; // 🔥 4x4
-const boardSize = 400;
+const size = 5;          // 🔥 5x5 = 25 частин
+const boardSize = 500;
 const pieceSize = boardSize / size;
 
 let dragged = null;
 
-// поле
+// створення поля
 for (let i = 0; i < size * size; i++) {
   const slot = document.createElement("div");
   slot.className = "slot";
@@ -18,7 +18,7 @@ for (let i = 0; i < size * size; i++) {
   board.appendChild(slot);
 }
 
-// частини
+// створення частин
 let pieces = [];
 
 for (let i = 0; i < size * size; i++) {
@@ -26,11 +26,11 @@ for (let i = 0; i < size * size; i++) {
   piece.className = "piece";
   piece.draggable = true;
 
-  const x = (i % size) * -pieceSize;
-  const y = Math.floor(i / size) * -pieceSize;
-
   piece.style.width = pieceSize + "px";
   piece.style.height = pieceSize + "px";
+
+  const x = (i % size) * -pieceSize;
+  const y = Math.floor(i / size) * -pieceSize;
   piece.style.backgroundPosition = `${x}px ${y}px`;
 
   piece.addEventListener("dragstart", e => dragged = e.target);
