@@ -16,11 +16,11 @@ h1 {
 }
 
 #board, #pieces {
-  width: 400px;
-  height: 400px;
+  width: 500px;
+  height: 500px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border: 2px dashed #aaa;
+  grid-template-columns: repeat(5, 1fr);
+  border: 2px dashed #999;
 }
 
 .slot {
@@ -28,8 +28,8 @@ h1 {
 }
 
 .piece {
-  background-image: url("puzzle.jpg");
-  background-size: 400px 400px;
+  background-image: url("./puzzle.jpg?v=3");
+  background-size: 500px 500px;
   cursor: grab;
 }
 
