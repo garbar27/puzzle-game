@@ -1,0 +1,30 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  text-align: center;
+}
+
+#game {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+#board, #pieces {
+  width: 300px;
+  height: 300px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 2px dashed #aaa;
+}
+
+.slot {
+  border: 1px solid #ccc;
+}
+
+.piece {
+  background-image: url("https://picsum.photos/300");
+  background-size: 300px 300px;
+  cursor: grab;
+}
