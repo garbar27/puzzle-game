@@ -1,20 +1,244 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Puzzle Game</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">🧩</span>
+      <span class="brand-title">Puzzle Game</span>
+    </div>
 
-<h1>🧩 Puzzle Game</h1>
+    <nav class="nav">
+      <button class="tab-btn is-active" data-tab="create">Create</button>
+      <button class="tab-btn" data-tab="play">Play</button>
+      <button class="tab-btn" data-tab="puzzles">My Puzzles</button>
+    </nav>
+  </header>
 
-<div id="game">
-  <div id="board"></div>
-  <div id="pieces"></div>
-</div>
+  <main class="wrap">
+    <!-- CREATE -->
+    <section class="panel" id="tab-create">
+      <div class="panel-head">
+        <h2>My Puzzles <span class="crumb">›</span> Create Puzzle</h2>
+        <p class="muted">Завантаж фото, задай назву, видимість і кількість частин.</p>
+      </div>
 
-<script src="script.js"></script>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Image</div>
+
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept="image/*" />
+            <div class="dz-inner">
+              <div class="dz-icon">🖼️</div>
+              <div class="dz-text">
+                <div><b>Перетягни</b> зображення сюди або <b>клікни</b>, щоб завантажити</div>
+                <div class="muted">PNG/JPG/WebP. Рекомендовано до ~3–5MB.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-row">
+            <div class="preview-box">
+              <img id="createPreview" alt="Preview" />
+              <div class="preview-placeholder" id="previewPlaceholder">Preview</div>
+            </div>
+
+            <div class="preview-actions">
+              <button class="btn" id="btnClearImage" type="button">Remove image</button>
+              <button class="btn primary" id="btnUseDefault" type="button">Use demo image</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Settings</div>
+
+          <div class="form">
+            <label class="field">
+              <span class="label">Name</span>
+              <input id="puzzleName" type="text" placeholder="Untitled" maxlength="60" />
+            </label>
+
+            <label class="field">
+              <span class="label">Visibility</span>
+              <select id="visibility">
+                <option value="public">Public</option>
+                <option value="link">Anyone with the link</option>
+                <option value="private">Private</option>
+              </select>
+              <div class="hint">
+                Private/Link-only у GitHub Pages працює як “локальне збереження в браузері”.
+              </div>
+            </label>
+
+            <label class="field">
+              <span class="label">Pieces</span>
+              <select id="piecesCount"></select>
+              <div class="hint">Кількість частин = точне число шматочків. Розкладка (ряди/колонки) підбереться автоматично.</div>
+            </label>
+
+            <label class="field">
+              <span class="label">Shape</span>
+              <div class="shape-row">
+                <label class="pill">
+                  <input type="radio" name="shape" value="square" checked />
+                  <span>Square</span>
+                </label>
+                <label class="pill">
+                  <input type="radio" name="shape" value="rounded" />
+                  <span>Rounded</span>
+                </label>
+                <label class="pill">
+                  <input type="radio" name="shape" value="soft" />
+                  <span>Soft</span>
+                </label>
+              </div>
+              <div class="hint">“Jigsaw” фігурні краї потребують окремого генератора масок; додамо в наступній версії, якщо захочеш.</div>
+            </label>
+
+            <div class="btn-row">
+              <button class="btn ghost" id="btnCancelCreate" type="button">Cancel</button>
+              <button class="btn primary" id="btnCreatePuzzle" type="button">Create</button>
+            </div>
+
+            <div class="share-row" id="shareRow">
+              <div class="share-title">Share link</div>
+              <input id="shareLink" type="text" readonly />
+              <button class="btn" id="btnCopyLink" type="button">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card tips">
+        <div class="card-title">Tips</div>
+        <ul>
+          <li>Краще підходять фото з чіткими деталями та контрастом.</li>
+          <li>Для мобільних: менше деталей = легше збирати.</li>
+          <li>Лідерборд зберігається локально (на твоєму пристрої).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- PLAY -->
+    <section class="panel hidden" id="tab-play">
+      <div class="panel-head play-head">
+        <div>
+          <h2 id="playTitle">Play</h2>
+          <p class="muted" id="playMeta"></p>
+        </div>
+
+        <div class="hud">
+          <div class="hud-box">
+            <div class="hud-label">Time</div>
+            <div class="hud-value" id="timer">00:00</div>
+          </div>
+          <button class="btn" id="btnShowImage" type="button">Image</button>
+          <button class="btn" id="btnShuffle" type="button">Shuffle</button>
+          <button class="btn ghost" id="btnBackToCreate" type="button">Back</button>
+        </div>
+      </div>
+
+      <div class="game">
+        <div class="board-wrap">
+          <div class="board" id="board"></div>
+        </div>
+
+        <div class="pieces-wrap">
+          <div class="pieces" id="pieces"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Leaderboard</div>
+          <div class="muted small">Записується лише найкращий час гравця для цього пазлу.</div>
+          <div id="leaderboard" class="leaderboard"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">How it works</div>
+          <ul class="muted">
+            <li>Таймер стартує при першій дії (переміщення/дроп).</li>
+            <li>Коли пазл зібраний — покажемо результат і запропонуємо ввести ім’я.</li>
+            <li>Якщо ти пройдеш швидше — лідерборд оновиться.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MY PUZZLES -->
+    <section class="panel hidden" id="tab-puzzles">
+      <div class="panel-head">
+        <h2>My Puzzles</h2>
+        <p class="muted">Список збережених пазлів на цьому пристрої (localStorage).</p>
+      </div>
+
+      <div class="card">
+        <div class="list-head">
+          <div class="filters">
+            <select id="filterVisibility">
+              <option value="all">All</option>
+              <option value="public">Public</option>
+              <option value="link">Anyone with the link</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+          <button class="btn primary" id="btnGoCreate" type="button">Create new</button>
+        </div>
+
+        <div id="puzzlesList" class="puzzles-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: FULL IMAGE -->
+  <div class="modal hidden" id="imageModal" aria-hidden="true">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">Reference image</div>
+        <button class="btn ghost" id="btnCloseModal" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" alt="Reference" />
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: WIN -->
+  <div class="modal hidden" id="winModal" aria-hidden="true">
+    <div class="modal-backdrop" id="winBackdrop"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">🎉 Puzzle completed!</div>
+        <button class="btn ghost" id="btnCloseWin" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="win-row">
+          <div class="win-time">
+            <div class="muted">Your time</div>
+            <div class="win-value" id="winTime">00:00</div>
+          </div>
+          <label class="field" style="width:100%;">
+            <span class="label">Your name</span>
+            <input id="playerName" type="text" placeholder="Player" maxlength="30"/>
+          </label>
+        </div>
+        <div class="btn-row" style="margin-top:12px;">
+          <button class="btn" id="btnSaveScore" type="button">Save to leaderboard</button>
+          <button class="btn primary" id="btnPlayAgain" type="button">Play again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
-
