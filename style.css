@@ -2,15 +2,19 @@
 <html lang="uk">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Puzzle Game</title>
+
+  <!-- Styles -->
   <link rel="stylesheet" href="./style.css" />
 
-  <!-- Konva (рендер) -->
+  <!-- Konva (обовʼязково для рендера) -->
   <script src="https://unpkg.com/konva@9/konva.min.js"></script>
-  <!-- Headbreaker (jigsaw + snap + автогенерація) -->
+
+  <!-- Headbreaker (jigsaw engine) -->
   <script src="https://flbulgarelli.github.io/headbreaker/js/headbreaker.js"></script>
 </head>
+
 <body>
   <header class="topbar">
     <div class="brand">
@@ -19,7 +23,7 @@
     </div>
 
     <nav class="nav">
-      <button class="nav-btn" data-route="create">Create</button>
+      <button class="nav-btn active" data-route="create">Create</button>
       <button class="nav-btn" data-route="play">Play</button>
       <button class="nav-btn" data-route="mypuzzles">My Puzzles</button>
     </nav>
@@ -27,13 +31,11 @@
 
   <main class="shell">
     <!-- CREATE -->
-    <section id="page-create" class="page">
+    <section id="page-create" class="page active">
       <div class="card big">
         <div class="card-head">
           <h1>Create Puzzle</h1>
-          <p class="muted">
-            Завантаж фото, задай назву, видимість і кількість частинок — і одразу починай гру.
-          </p>
+          <p class="muted">Завантаж фото або натисни “Use demo image”, вибери кількість частинок і починай гру.</p>
         </div>
 
         <div class="grid-2">
@@ -42,11 +44,11 @@
 
             <div id="dropzone" class="dropzone" tabindex="0">
               <div class="dz-title">Перетягни фото сюди або клікни, щоб завантажити</div>
-              <div class="dz-sub muted">PNG/JPG/WebP. Рекомендовано до ~3–5MB.</div>
+              <div class="dz-sub muted">PNG/JPG/WebP • рекомендовано до 3–5MB</div>
               <input id="fileInput" class="dz-input" type="file" accept="image/*" />
             </div>
 
-            <div class="row gap">
+            <div class="row gap" style="margin-top:10px">
               <button id="useDemo" class="btn ghost">Use demo image</button>
               <button id="removeImage" class="btn ghost danger">Remove</button>
             </div>
@@ -54,11 +56,6 @@
             <div class="preview-wrap">
               <div class="label muted">Preview</div>
               <img id="imgPreview" class="preview" alt="preview" />
-            </div>
-
-            <div class="help muted">
-              ⚠️ Private/Link-only на GitHub Pages працює як “локальне збереження в браузері”.
-              На іншому пристрої цього пазла не буде, якщо ти не перенесеш дані (це версія без бекенду).
             </div>
           </div>
 
@@ -83,10 +80,6 @@
               <option selected>64</option><option>72</option><option>90</option><option>100</option>
               <option>120</option><option>140</option><option>164</option><option>180</option><option>200</option>
             </select>
-
-            <div class="help muted">
-              Кількість = точне число частинок. Розкладка (ряди/колонки) підбирається автоматично під фото.
-            </div>
 
             <div class="spacer"></div>
 
@@ -133,7 +126,7 @@
 
         <div class="side-card">
           <div class="stage-title muted">Leaderboard</div>
-          <div class="muted small">Записується найкращий час для кожного імені (localStorage).</div>
+          <div class="muted small">Зберігається найкращий час (localStorage).</div>
           <div id="leaderboard" class="leaderboard"></div>
         </div>
       </div>
@@ -144,7 +137,7 @@
       <div class="card">
         <div class="card-head">
           <h1>My Puzzles</h1>
-          <p class="muted">Список збережених пазлів у твоєму браузері.</p>
+          <p class="muted">Збережені пазли в цьому браузері.</p>
         </div>
         <div id="myPuzzlesList" class="list"></div>
       </div>
@@ -190,10 +183,10 @@
     </div>
   </div>
 
-  <footer class="footer muted">
-    Made for GitHub Pages • працює без бекенду (localStorage)
-  </footer>
+  <footer class="footer muted">Made for GitHub Pages • localStorage</footer>
 
+  <!-- JS MUST be last -->
   <script src="./script.js"></script>
 </body>
 </html>
+
