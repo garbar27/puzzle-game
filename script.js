@@ -1,34 +1,28 @@
-const imageInput = document.getElementById("imageInput");
-const startBtn = document.getElementById("startBtn");
-const piecesSelect = document.getElementById("pieces");
-const puzzleEl = document.getElementById("puzzle");
-const timeEl = document.getElementById("time");
-const scoresEl = document.getElementById("scores");
-
-let timer = null;
+let timerInterval;
 let seconds = 0;
 let started = false;
 
-/* ---------- TIMER ---------- */
+const timerEl = document.getElementById("timer");
+const scoresEl = document.getElementById("scores");
+
 function startTimer() {
-  if (timer) return;
-  timer = setInterval(() => {
+  if (started) return;
+  started = true;
+  timerInterval = setInterval(() => {
     seconds++;
     const m = String(Math.floor(seconds / 60)).padStart(2, "0");
     const s = String(seconds % 60).padStart(2, "0");
-    timeEl.textContent = `${m}:${s}`;
+    timerEl.textContent = `${m}:${s}`;
   }, 1000);
 }
 
 function stopTimer() {
-  clearInterval(timer);
-  timer = null;
+  clearInterval(timerInterval);
 }
 
-/* ---------- LEADERBOARD ---------- */
-function saveScore(sec) {
+function saveScore() {
   const scores = JSON.parse(localStorage.getItem("scores") || "[]");
-  scores.push(sec);
+  scores.push(seconds);
   scores.sort((a, b) => a - b);
   localStorage.setItem("scores", JSON.stringify(scores.slice(0, 5)));
   renderScores();
@@ -39,81 +33,68 @@ function renderScores() {
   const scores = JSON.parse(localStorage.getItem("scores") || "[]");
   scores.forEach(s => {
     const li = document.createElement("li");
-    li.textContent =
-      `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    li.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
     scoresEl.appendChild(li);
   });
 }
 
 renderScores();
 
-/* ---------- MAIN ---------- */
-startBtn.onclick = () => {
-  puzzleEl.innerHTML = "";
-  stopTimer();
+document.getElementById("startBtn").onclick = () => {
   seconds = 0;
-  timeEl.textContent = "00:00";
   started = false;
+  timerEl.textContent = "00:00";
+  clearInterval(timerInterval);
 
-  const file = imageInput.files[0];
+  document.getElementById("canvas").innerHTML = "";
+
+  const input = document.getElementById("imageInput");
+  const pieces = Number(document.getElementById("pieces").value);
+
   const img = new Image();
+  img.onload = () => createPuzzle(img, pieces);
 
-  img.src = file
-    ? URL.createObjectURL(file)
-    : "puzzle.jpg";
-
-  img.onload = () => {
-    const pieceCount = Number(piecesSelect.value);
-    const grid = Math.round(Math.sqrt(pieceCount));
-
-    const puzzle = new headbreaker.Canvas("puzzle", {
-      width: 600,
-      height: 600,
-      image: img,
-      pieceSize: 600 / grid,
-      proximity: 25,
-      borderFill: 10,
-      strokeWidth: 1,
-      lineSoftness: 0.2,
-      preventOffstageDrag: true
-    });
-
-    puzzle.autogenerate({
-      horizontalPiecesCount: grid,
-      verticalPiecesCount: grid
-    });
-
-    puzzle.shuffle();
-    puzzle.attachSolvedValidator();
-
-    /* 🧲 ВАЖЛИВО: GROUP DRAG */
-    puzzle.on("piece-moved", piece => {
-      if (!started) {
-        started = true;
-        startTimer();
-      }
-
-      const group = piece.group;
-      if (!group) return;
-
-      const { x, y } = piece;
-
-      group.pieces.forEach(p => {
-        if (p !== piece) {
-          p.setPosition(
-            x + (p.col - piece.col) * puzzle.pieceSize,
-            y + (p.row - piece.row) * puzzle.pieceSize
-          );
-        }
-      });
-    });
-
-    puzzle.on("solved", () => {
-      stopTimer();
-      saveScore(seconds);
-      alert("🧩 Puzzle completed!");
-    });
-
-    puzzle.draw();
-  };
+  if (input.files[0]) {
+    img.src = URL.createObjectURL(input.files[0]);
+  } else {
+    img.src = "puzzle.jpg"; // fallback
+  }
 };
+
+function createPuzzle(image, pieces) {
+  const stage = new Konva.Stage({
+    container: "canvas",
+    width: 600,
+    height: 600
+  });
+
+  const puzzle = new headbreaker.Canvas("canvas", {
+    width: 600,
+    height: 600,
+    pieceSize: Math.sqrt((600 * 600) / pieces),
+    proximity: 20,
+    borderFill: 10,
+    strokeWidth: 1,
+    lineSoftness: 0.18,
+    image: image
+  });
+
+  puzzle.autogenerate({
+    horizontalPiecesCount: Math.round(Math.sqrt(pieces)),
+    verticalPiecesCount: Math.round(Math.sqrt(pieces))
+  });
+
+  puzzle.shuffle();
+
+  puzzle.onConnect(() => {
+    startTimer();
+  });
+
+  puzzle.onComplete(() => {
+    stopTimer();
+    saveScore();
+    alert("🎉 Puzzle completed!");
+  });
+
+  puzzle.draw();
+}
