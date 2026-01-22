@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Puzzle Game</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -12,27 +12,20 @@
   <div id="timer">00:00</div>
 </header>
 
-<main>
-  <div id="game">
-    <div id="board"></div>
-  </div>
+<div id="controls">
+  <input type="file" id="imageInput" accept="image/*">
+  <select id="pieces">
+    <option value="16">16</option>
+    <option value="25">25</option>
+    <option value="36">36</option>
+  </select>
+  <button id="start">Start Puzzle</button>
+</div>
 
-  <div id="controls">
-    <input type="file" id="imageInput" accept="image/*">
-    <select id="piecesSelect">
-      <option value="16">16</option>
-      <option value="25">25</option>
-      <option value="36">36</option>
-      <option value="49">49</option>
-    </select>
-    <button id="startBtn">Create & Play</button>
-  </div>
+<div id="board"></div>
 
-  <div id="leaderboard">
-    <h3>🏆 Leaderboard</h3>
-    <ul id="scores"></ul>
-  </div>
-</main>
+<h3>🏆 Leaderboard</h3>
+<ul id="leaderboard"></ul>
 
 <script src="script.js"></script>
 </body>
