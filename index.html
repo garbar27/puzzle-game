@@ -1,96 +1,244 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Puzzle Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css?v=1">
+<meta charset="UTF-8">
+<title>Puzzle Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* ===== GLOBAL ===== */
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,Arial;
+  color:#f4efff;
+  background:
+    radial-gradient(800px 500px at 20% 20%, rgba(180,120,255,.25), transparent 60%),
+    radial-gradient(800px 500px at 80% 30%, rgba(120,200,255,.15), transparent 60%),
+    linear-gradient(180deg,#0b0616,#140a24);
+}
+
+/* ===== HEADER ===== */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  background:rgba(0,0,0,.4);
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+nav button{
+  margin-left:6px;
+  padding:8px 14px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.05);
+  color:#fff;
+  cursor:pointer;
+}
+nav button.active{
+  background:#9f6cff;
+}
+
+/* ===== LAYOUT ===== */
+main{
+  max-width:1100px;
+  margin:20px auto;
+  padding:0 16px;
+}
+section{display:none}
+section.active{display:block}
+
+/* ===== CARDS ===== */
+.card{
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+}
+input,select{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.2);
+  background:#000;
+  color:#fff;
+}
+button{
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.2);
+  background:#222;
+  color:#fff;
+  cursor:pointer;
+}
+.primary{background:#9f6cff}
+
+/* ===== GAME ===== */
+.game{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.board,.pieces{
+  aspect-ratio:1/1;
+  display:grid;
+  border:2px dashed rgba(255,255,255,.25);
+}
+.slot{border:1px solid rgba(255,255,255,.1)}
+.piece{
+  background-size:cover;
+  cursor:grab;
+}
+
+/* ===== MODAL ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.modal.active{display:flex}
+.modal img{
+  max-width:90vw;
+  max-height:80vh;
+  border-radius:16px;
+  border:2px solid #9f6cff;
+}
+</style>
 </head>
+
 <body>
 
-<header class="topbar">
-  <div class="brand">🧩 Puzzle Game</div>
-  <nav class="nav">
-    <button class="tab-btn is-active" data-tab="create">Create</button>
-    <button class="tab-btn" data-tab="play">Play</button>
-    <button class="tab-btn" data-tab="my">My Puzzles</button>
+<header>
+  <strong>🧩 Puzzle Game</strong>
+  <nav>
+    <button class="active" data-tab="create">Create</button>
+    <button data-tab="play">Play</button>
+    <button data-tab="my">My Puzzles</button>
   </nav>
 </header>
 
-<main class="wrap">
+<main>
 
-  <!-- CREATE -->
-  <section class="panel" id="panel-create">
+<section id="create" class="active">
+  <div class="card">
     <h2>Create Puzzle</h2>
+    <input type="file" id="imgInput" accept="image/*">
+    <input type="text" id="puzzleName" placeholder="Puzzle name">
+    <select id="piecesCount">
+      <option>10</option><option>20</option><option>32</option>
+      <option>48</option><option>64</option><option>90</option>
+      <option>100</option><option>144</option><option>196</option>
+    </select>
+    <button class="primary" id="createBtn">Create & Play</button>
+  </div>
+</section>
 
-    <div class="card form">
-      <label class="label">Image</label>
-      <input type="file" id="imageInput" accept="image/*">
+<section id="play">
+  <div class="card">
+    ⏱ Time: <span id="timer">00:00</span>
+    <button id="showImage">Image</button>
+  </div>
+  <div class="game">
+    <div class="board" id="board"></div>
+    <div class="pieces" id="pieces"></div>
+  </div>
+</section>
 
-      <label class="label">Puzzle name</label>
-      <input type="text" id="puzzleName" placeholder="Untitled">
-
-      <label class="label">Visibility</label>
-      <select id="visibility">
-        <option>Public</option>
-        <option>Anyone with link</option>
-        <option>Private</option>
-      </select>
-
-      <label class="label">Pieces</label>
-      <select id="piecesCount">
-        <option>10</option><option>20</option><option>32</option><option>48</option>
-        <option>64</option><option>72</option><option>90</option><option>100</option>
-        <option>120</option><option>140</option><option>164</option><option>180</option>
-        <option>200</option>
-      </select>
-
-      <div class="btn-row">
-        <button class="btn ghost" id="resetBtn">Cancel</button>
-        <button class="btn primary" id="createBtn">Create</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- PLAY -->
-  <section class="panel hidden" id="panel-play">
-    <h2>Play</h2>
-
-    <div class="hud">
-      <div class="hud-box">⏱ <span id="timer">00:00</span></div>
-      <button class="btn" id="showImage">Image</button>
-    </div>
-
-    <div class="game">
-      <div class="board-wrap">
-        <div id="board" class="board"></div>
-      </div>
-      <div class="pieces-wrap">
-        <div id="pieces" class="pieces"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MY PUZZLES -->
-  <section class="panel hidden" id="panel-my">
-    <h2>My Puzzles</h2>
-    <div id="myList" class="card muted">Saved locally (demo)</div>
-  </section>
+<section id="my">
+  <div class="card">Saved puzzles (demo)</div>
+</section>
 
 </main>
 
-<!-- MODAL IMAGE -->
-<div class="modal hidden" id="imageModal">
-  <div class="modal-backdrop"></div>
-  <div class="modal-card">
-    <div class="modal-body">
-      <img id="fullImage">
-      <div class="btn-row">
-        <button class="btn" onclick="closeImage()">Close</button>
-      </div>
-    </div>
-  </div>
+<div class="modal" id="imageModal" onclick="this.classList.remove('active')">
+  <img id="fullImg">
 </div>
+
+<script>
+/* ===== TABS ===== */
+const tabs=document.querySelectorAll("nav button");
+const sections=document.querySelectorAll("section");
+tabs.forEach(b=>{
+  b.onclick=()=>{
+    tabs.forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    sections.forEach(s=>s.classList.remove("active"));
+    document.getElementById(b.dataset.tab).classList.add("active");
+  }
+});
+
+/* ===== GAME ===== */
+let imageData=null;
+let timer=0, interval=null;
+const board=document.getElementById("board");
+const pieces=document.getElementById("pieces");
+
+imgInput.onchange=e=>{
+  const r=new FileReader();
+  r.onload=()=>imageData=r.result;
+  r.readAsDataURL(e.target.files[0]);
+};
+
+createBtn.onclick=()=>{
+  if(!imageData){alert("Upload image");return;}
+  startPuzzle(+piecesCount.value);
+  tabs[1].click();
+};
+
+function startPuzzle(count){
+  board.innerHTML=""; pieces.innerHTML="";
+  timer=0; timerEl.textContent="00:00";
+  clearInterval(interval);
+  interval=setInterval(()=>{
+    timer++;
+    timerEl.textContent=
+      String(timer/60|0).padStart(2,"0")+":"+
+      String(timer%60).padStart(2,"0");
+  },1000);
+
+  const size=Math.round(Math.sqrt(count));
+  board.style.gridTemplateColumns=`repeat(${size},1fr)`;
+  pieces.style.gridTemplateColumns=`repeat(${size},1fr)`;
+
+  for(let i=0;i<size*size;i++){
+    const s=document.createElement("div");
+    s.className="slot";
+    s.ondragover=e=>e.preventDefault();
+    s.ondrop=e=>{
+      const id=e.dataTransfer.getData("id");
+      if(id)s.appendChild(document.getElementById(id));
+    };
+    board.appendChild(s);
+
+    const p=document.createElement("div");
+    p.className="piece";
+    p.id="p"+i;
+    p.draggable=true;
+    p.style.backgroundImage=`url(${imageData})`;
+    p.style.backgroundSize=`${size*100}% ${size*100}%`;
+    p.style.backgroundPosition=
+      `${(i%size)*-100}% ${Math.floor(i/size)*-100}%`;
+    p.ondragstart=e=>e.dataTransfer.setData("id",p.id);
+    pieces.appendChild(p);
+  }
+}
+
+showImage.onclick=()=>{
+  fullImg.src=imageData;
+  imageModal.classList.add("active");
+};
+</script>
+
+</body>
+</html>
+
 
 <script src="script.js?v=1"></script>
 </body>
