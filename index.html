@@ -83,12 +83,9 @@ button{
 button:disabled{opacity:.5;cursor:not-allowed}
 
 /* PREVIEW */
-.preview{
-  margin-top:14px;
-  display:none;
-}
+.preview{margin-top:14px;display:none}
 .preview img{
-  max-width:100%;
+  max-width:200px;
   border-radius:14px;
   border:2px solid rgba(255,255,255,.2);
 }
@@ -98,14 +95,13 @@ button:disabled{opacity:.5;cursor:not-allowed}
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:10px;
+  margin-bottom:12px;
 }
 .canvas{
   position:relative;
-  width:100%;
-  max-width:900px;
+  width:640px;
+  height:640px;
   margin:0 auto;
-  aspect-ratio:1/1;
   background:rgba(0,0,0,.35);
   border:2px dashed rgba(255,255,255,.3);
   border-radius:16px;
@@ -113,9 +109,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
 }
 .piece{
   position:absolute;
-  background-size:100% 100%;
+  background-repeat:no-repeat;
   cursor:grab;
   border-radius:6px;
+  box-shadow:0 6px 18px rgba(0,0,0,.6);
 }
 
 /* MODAL */
@@ -193,6 +190,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 </div>
 
 <script>
+/* TABS */
 const tabs=document.querySelectorAll("nav button");
 const sections=document.querySelectorAll("section");
 tabs.forEach(b=>{
@@ -204,9 +202,11 @@ tabs.forEach(b=>{
   }
 });
 
+/* GAME STATE */
 let imageData=null;
 let timer=0, interval=null;
 
+/* IMAGE UPLOAD */
 imgInput.onchange=e=>{
   const file=e.target.files[0];
   if(!file) return;
@@ -220,14 +220,17 @@ imgInput.onchange=e=>{
   r.readAsDataURL(file);
 };
 
+/* CREATE */
 createBtn.onclick=()=>{
   startGame(+piecesCount.value);
   tabs[1].click();
 };
 
+/* GAME LOGIC */
 function startGame(count){
   const canvas=document.getElementById("canvas");
   canvas.innerHTML="";
+
   timer=0;
   clearInterval(interval);
   interval=setInterval(()=>{
@@ -238,18 +241,20 @@ function startGame(count){
   },1000);
 
   const size=Math.round(Math.sqrt(count));
-  const pieceSize=canvas.clientWidth/size;
+  const canvasSize=canvas.clientWidth;
+  const pieceSize=canvasSize/size;
 
   for(let i=0;i<size*size;i++){
     const p=document.createElement("div");
     p.className="piece";
     p.style.width=p.style.height=pieceSize+"px";
     p.style.backgroundImage=`url(${imageData})`;
-    p.style.backgroundSize=`${size*100}% ${size*100}%`;
+    p.style.backgroundSize=`${canvasSize}px ${canvasSize}px`;
     p.style.backgroundPosition=
-      `${(i%size)*-100}% ${Math.floor(i/size)*-100}%`;
-    p.style.left=Math.random()*(canvas.clientWidth-pieceSize)+"px";
-    p.style.top=Math.random()*(canvas.clientHeight-pieceSize)+"px";
+      `${-(i%size)*pieceSize}px ${-Math.floor(i/size)*pieceSize}px`;
+
+    p.style.left=Math.random()*(canvasSize-pieceSize)+"px";
+    p.style.top=Math.random()*(canvasSize-pieceSize)+"px";
 
     p.onmousedown=e=>{
       const shiftX=e.offsetX, shiftY=e.offsetY;
@@ -264,10 +269,12 @@ function startGame(count){
         document.onmouseup=null;
       };
     };
+
     canvas.appendChild(p);
   }
 }
 
+/* IMAGE PREVIEW */
 showImage.onclick=()=>{
   fullImg.src=imageData;
   imageModal.classList.add("active");
