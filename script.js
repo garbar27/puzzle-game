@@ -1,58 +1,58 @@
 const board = document.getElementById("board");
-const startBtn = document.getElementById("startBtn");
+const startBtn = document.getElementById("start");
 const imageInput = document.getElementById("imageInput");
-const piecesSelect = document.getElementById("piecesSelect");
+const piecesSelect = document.getElementById("pieces");
 const timerEl = document.getElementById("timer");
-const scoresEl = document.getElementById("scores");
+const leaderboardEl = document.getElementById("leaderboard");
 
-let pieces = [];
 let img = new Image();
+let pieces = [];
 let started = false;
-let timer = null;
-let seconds = 0;
-let solvedCount = 0;
+let time = 0;
+let timer;
+let solved = 0;
 
 function startTimer() {
   if (started) return;
   started = true;
   timer = setInterval(() => {
-    seconds++;
+    time++;
     timerEl.textContent =
-      String(Math.floor(seconds / 60)).padStart(2, "0") +
+      String(Math.floor(time / 60)).padStart(2, "0") +
       ":" +
-      String(seconds % 60).padStart(2, "0");
+      String(time % 60).padStart(2, "0");
   }, 1000);
 }
 
 function stopTimer() {
   clearInterval(timer);
-  saveScore(seconds);
+  saveScore(time);
 }
 
-function saveScore(time) {
+function saveScore(t) {
   const scores = JSON.parse(localStorage.getItem("scores") || "[]");
-  scores.push(time);
+  scores.push(t);
   scores.sort((a, b) => a - b);
   localStorage.setItem("scores", JSON.stringify(scores.slice(0, 5)));
   renderScores();
 }
 
 function renderScores() {
+  leaderboardEl.innerHTML = "";
   const scores = JSON.parse(localStorage.getItem("scores") || "[]");
-  scoresEl.innerHTML = "";
   scores.forEach(s => {
     const li = document.createElement("li");
     li.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-    scoresEl.appendChild(li);
+    leaderboardEl.appendChild(li);
   });
 }
 
 function createPuzzle() {
   board.innerHTML = "";
   pieces = [];
-  solvedCount = 0;
-  seconds = 0;
+  solved = 0;
   started = false;
+  time = 0;
   timerEl.textContent = "00:00";
 
   const total = Number(piecesSelect.value);
@@ -84,44 +84,45 @@ function createPuzzle() {
   }
 }
 
-function drag(el) {
+function drag(piece) {
   let offsetX, offsetY;
 
-  el.onmousedown = e => {
-    if (el.classList.contains("locked")) return;
+  piece.onmousedown = e => {
+    if (piece.classList.contains("locked")) return;
     startTimer();
+
     offsetX = e.offsetX;
     offsetY = e.offsetY;
-    el.style.zIndex = 1000;
 
     document.onmousemove = e => {
-      el.style.left = e.pageX - board.offsetLeft - offsetX + "px";
-      el.style.top = e.pageY - board.offsetTop - offsetY + "px";
+      piece.style.left = e.pageX - board.offsetLeft - offsetX + "px";
+      piece.style.top = e.pageY - board.offsetTop - offsetY + "px";
     };
 
     document.onmouseup = () => {
       document.onmousemove = null;
       document.onmouseup = null;
-      el.style.zIndex = "";
 
-      const dx = Math.abs(parseFloat(el.style.left) - el.dataset.x);
-      const dy = Math.abs(parseFloat(el.style.top) - el.dataset.y);
+      const dx = Math.abs(parseFloat(piece.style.left) - piece.dataset.x);
+      const dy = Math.abs(parseFloat(piece.style.top) - piece.dataset.y);
 
       if (dx < 15 && dy < 15) {
-        el.style.left = el.dataset.x + "px";
-        el.style.top = el.dataset.y + "px";
-        el.classList.add("locked");
-        solvedCount++;
-        if (solvedCount === pieces.length) stopTimer();
+        piece.style.left = piece.dataset.x + "px";
+        piece.style.top = piece.dataset.y + "px";
+        piece.classList.add("locked");
+        solved++;
+        if (solved === pieces.length) stopTimer();
       }
     };
   };
 }
 
 startBtn.onclick = () => {
-  const file = imageInput.files[0];
-  if (!file) return alert("Upload image");
-  img.src = URL.createObjectURL(file);
+  if (!imageInput.files[0]) {
+    alert("Завантаж зображення");
+    return;
+  }
+  img.src = URL.createObjectURL(imageInput.files[0]);
   img.onload = createPuzzle;
 };
 
