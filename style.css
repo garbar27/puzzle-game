@@ -1,88 +1,56 @@
 * {
   box-sizing: border-box;
-  font-family: system-ui, sans-serif;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #2b0a3d, #0b1024);
+  font-family: system-ui, sans-serif;
+  background: radial-gradient(circle at top left, #3a145f, #090015);
   color: #fff;
 }
 
-.topbar {
+header {
+  display: flex;
+  justify-content: space-between;
   padding: 16px 24px;
   font-size: 20px;
-  font-weight: bold;
 }
 
-.app {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.panel {
+.controls {
   display: flex;
   gap: 12px;
+  padding: 16px 24px;
   align-items: center;
-  flex-wrap: wrap;
-  background: rgba(255,255,255,0.05);
-  padding: 16px;
-  border-radius: 12px;
 }
 
-.panel h2 {
-  width: 100%;
-  margin: 0 0 8px;
-}
-
-.panel input,
-.panel select,
-.panel button {
+.controls input,
+.controls select,
+.controls button {
   padding: 8px 12px;
   border-radius: 8px;
   border: none;
 }
 
-.panel button {
-  background: #9b6bff;
-  color: #fff;
+.controls button {
+  background: #8b5cf6;
+  color: white;
   cursor: pointer;
 }
 
-.panel button:hover {
-  background: #b28cff;
-}
-
-.timer {
-  margin-left: auto;
-  font-size: 18px;
-}
-
-.game {
-  margin-top: 20px;
+main {
   display: flex;
   justify-content: center;
+  padding: 20px;
 }
 
-#puzzle {
+#canvas {
   width: 600px;
   height: 600px;
-  background: rgba(0,0,0,0.3);
+  background: #1a102a;
   border-radius: 16px;
 }
 
 .leaderboard {
-  margin-top: 20px;
-  background: rgba(255,255,255,0.05);
-  padding: 16px;
-  border-radius: 12px;
-}
-
-.leaderboard ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 20px 24px;
 }
 
