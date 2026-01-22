@@ -62,7 +62,6 @@ startBtn.onclick = () => {
     ? URL.createObjectURL(file)
     : "puzzle.jpg";
 
-  /* 🔴 ВАЖЛИВО: ЧЕКАЄМО ЗАВАНТАЖЕННЯ */
   img.onload = () => {
     const pieceCount = Number(piecesSelect.value);
     const grid = Math.round(Math.sqrt(pieceCount));
@@ -72,10 +71,11 @@ startBtn.onclick = () => {
       height: 600,
       image: img,
       pieceSize: 600 / grid,
-      proximity: 20,
+      proximity: 25,
       borderFill: 10,
       strokeWidth: 1,
-      lineSoftness: 0.18
+      lineSoftness: 0.2,
+      preventOffstageDrag: true
     });
 
     puzzle.autogenerate({
@@ -86,11 +86,26 @@ startBtn.onclick = () => {
     puzzle.shuffle();
     puzzle.attachSolvedValidator();
 
-    puzzle.on("piece-moved", () => {
+    /* 🧲 ВАЖЛИВО: GROUP DRAG */
+    puzzle.on("piece-moved", piece => {
       if (!started) {
         started = true;
         startTimer();
       }
+
+      const group = piece.group;
+      if (!group) return;
+
+      const { x, y } = piece;
+
+      group.pieces.forEach(p => {
+        if (p !== piece) {
+          p.setPosition(
+            x + (p.col - piece.col) * puzzle.pieceSize,
+            y + (p.row - piece.row) * puzzle.pieceSize
+          );
+        }
+      });
     });
 
     puzzle.on("solved", () => {
