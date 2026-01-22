@@ -1,63 +1,126 @@
-/* === FIX FOR MODALS & CLICKS === */
-
-.modal {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  z-index: 9999;
-  pointer-events: auto;
+body{
+  margin:0;
+  font-family:system-ui,Arial;
+  color:#f4efff;
+  background:
+    radial-gradient(800px 500px at 20% 20%, rgba(180,120,255,.25), transparent 60%),
+    radial-gradient(800px 500px at 80% 30%, rgba(120,200,255,.15), transparent 60%),
+    linear-gradient(180deg,#0b0616,#140a24);
 }
 
-.modal.hidden {
-  display: none;
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  background:rgba(0,0,0,.4);
+  border-bottom:1px solid rgba(255,255,255,.1);
 }
 
-.modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  z-index: 1;
-  pointer-events: auto;
+.nav button{
+  margin-left:6px;
 }
 
-.modal-card {
-  position: relative;
-  z-index: 2;
-  pointer-events: auto;
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,.15);
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
-  max-width: 480px;
-  width: calc(100% - 32px);
+.tab-btn{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.15);
+  color:#fff;
+  padding:8px 14px;
+  border-radius:20px;
+  cursor:pointer;
 }
 
-.modal-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px;
-  border-bottom: 1px solid rgba(255,255,255,.1);
+.tab-btn.is-active{
+  background:rgba(180,120,255,.4);
 }
 
-.modal-body {
-  padding: 14px;
+.wrap{
+  max-width:1100px;
+  margin:20px auto;
+  padding:0 16px;
 }
 
-/* buttons inside modal */
-.modal-card .btn {
-  pointer-events: auto;
-  cursor: pointer;
+.panel.hidden{display:none;}
+
+.card{
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:16px;
+  padding:16px;
 }
 
-/* prevent background scroll when modal open */
-body.modal-open {
-  overflow: hidden;
+.form input,.form select{
+  margin-bottom:10px;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.2);
+  background:#000;
+  color:#fff;
 }
 
-
-.modal-body img{
-  width:100%;
-  border-radius:14px;
+.btn{
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.2);
+  background:#222;
+  color:#fff;
+  cursor:pointer;
 }
+
+.btn.primary{background:#9f6cff;}
+.btn.ghost{background:transparent;}
+
+.btn-row{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+.game{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-top:16px;
+}
+
+.board,.pieces{
+  aspect-ratio:1/1;
+  display:grid;
+  border:2px dashed rgba(255,255,255,.25);
+}
+
+.slot{border:1px solid rgba(255,255,255,.1);}
+
+.piece{
+  background-size:cover;
+  cursor:grab;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:grid;
+  place-items:center;
+  z-index:9999;
+}
+
+.modal.hidden{display:none;}
+
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.7);
+}
+
+.modal-card{
+  position:relative;
+  background:#140a24;
+  border-radius:16px;
+  padding:12px;
+}
+
+.modal img{
+  max-width:90vw;
+  max-height:70vh;
+}
+
