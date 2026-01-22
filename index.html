@@ -6,15 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* ===== GLOBAL ===== */
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:system-ui,Arial;
   color:#f4efff;
   background:
-    radial-gradient(800px 500px at 20% 20%, rgba(180,120,255,.25), transparent 60%),
-    radial-gradient(800px 500px at 80% 30%, rgba(120,200,255,.15), transparent 60%),
+    radial-gradient(900px 600px at 20% 20%, rgba(180,120,255,.25), transparent 60%),
+    radial-gradient(900px 600px at 80% 30%, rgba(120,200,255,.15), transparent 60%),
     linear-gradient(180deg,#0b0616,#140a24);
 }
 
@@ -23,53 +22,59 @@ header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:14px 18px;
-  background:rgba(0,0,0,.4);
-  border-bottom:1px solid rgba(255,255,255,.1);
+  padding:14px 20px;
+  background:rgba(0,0,0,.45);
 }
 nav button{
   margin-left:6px;
-  padding:8px 14px;
-  border-radius:20px;
-  border:1px solid rgba(255,255,255,.2);
-  background:rgba(255,255,255,.05);
+  padding:8px 16px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
   color:#fff;
   cursor:pointer;
 }
-nav button.active{
-  background:#9f6cff;
-}
+nav button.active{background:#9f6cff}
 
 /* ===== LAYOUT ===== */
 main{
-  max-width:1100px;
-  margin:20px auto;
-  padding:0 16px;
+  max-width:1200px;
+  margin:30px auto;
+  padding:0 20px;
 }
 section{display:none}
 section.active{display:block}
 
-/* ===== CARDS ===== */
+/* ===== CARD ===== */
 .card{
-  background:rgba(0,0,0,.35);
+  max-width:700px;
+  margin:0 auto;
+  background:rgba(0,0,0,.4);
   border:1px solid rgba(255,255,255,.15);
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:16px;
+  border-radius:18px;
+  padding:20px;
 }
+
+/* ===== FORM ===== */
+label{display:block;margin-bottom:6px;opacity:.9}
 input,select{
   width:100%;
   padding:10px;
-  margin-bottom:10px;
+  margin-bottom:14px;
   border-radius:10px;
   border:1px solid rgba(255,255,255,.2);
   background:#000;
   color:#fff;
 }
+.actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
 button{
-  padding:10px 14px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.2);
+  padding:10px 18px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.25);
   background:#222;
   color:#fff;
   cursor:pointer;
@@ -77,20 +82,34 @@ button{
 .primary{background:#9f6cff}
 
 /* ===== GAME ===== */
-.game{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
+.game-wrap{
+  position:relative;
+  width:100%;
+  max-width:900px;
+  margin:0 auto;
 }
-.board,.pieces{
+.canvas{
+  position:relative;
+  width:100%;
   aspect-ratio:1/1;
-  display:grid;
-  border:2px dashed rgba(255,255,255,.25);
+  background:rgba(0,0,0,.35);
+  border:2px dashed rgba(255,255,255,.3);
+  border-radius:16px;
+  overflow:hidden;
 }
-.slot{border:1px solid rgba(255,255,255,.1)}
 .piece{
-  background-size:cover;
+  position:absolute;
+  background-size:100% 100%;
   cursor:grab;
+  border-radius:6px;
+}
+
+/* ===== TOP BAR ===== */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
 }
 
 /* ===== MODAL ===== */
@@ -101,12 +120,12 @@ button{
   display:none;
   align-items:center;
   justify-content:center;
-  z-index:9999;
+  z-index:999;
 }
 .modal.active{display:flex}
 .modal img{
   max-width:90vw;
-  max-height:80vh;
+  max-height:85vh;
   border-radius:16px;
   border:2px solid #9f6cff;
 }
@@ -120,7 +139,6 @@ button{
   <nav>
     <button class="active" data-tab="create">Create</button>
     <button data-tab="play">Play</button>
-    <button data-tab="my">My Puzzles</button>
   </nav>
 </header>
 
@@ -129,30 +147,36 @@ button{
 <section id="create" class="active">
   <div class="card">
     <h2>Create Puzzle</h2>
+
+    <label>Image</label>
     <input type="file" id="imgInput" accept="image/*">
-    <input type="text" id="puzzleName" placeholder="Puzzle name">
+
+    <label>Puzzle name</label>
+    <input id="puzzleName" placeholder="Untitled">
+
+    <label>Pieces</label>
     <select id="piecesCount">
       <option>10</option><option>20</option><option>32</option>
-      <option>48</option><option>64</option><option>90</option>
+      <option>48</option><option selected>72</option>
       <option>100</option><option>144</option><option>196</option>
     </select>
-    <button class="primary" id="createBtn">Create & Play</button>
+
+    <div class="actions">
+      <button id="cancelBtn">Cancel</button>
+      <button class="primary" id="createBtn">Create</button>
+    </div>
   </div>
 </section>
 
 <section id="play">
-  <div class="card">
-    ⏱ Time: <span id="timer">00:00</span>
+  <div class="topbar">
+    <div>⏱ <span id="timer">00:00</span></div>
     <button id="showImage">Image</button>
   </div>
-  <div class="game">
-    <div class="board" id="board"></div>
-    <div class="pieces" id="pieces"></div>
-  </div>
-</section>
 
-<section id="my">
-  <div class="card">Saved puzzles (demo)</div>
+  <div class="game-wrap">
+    <div class="canvas" id="canvas"></div>
+  </div>
 </section>
 
 </main>
@@ -174,11 +198,9 @@ tabs.forEach(b=>{
   }
 });
 
-/* ===== GAME ===== */
+/* ===== GAME LOGIC ===== */
 let imageData=null;
 let timer=0, interval=null;
-const board=document.getElementById("board");
-const pieces=document.getElementById("pieces");
 
 imgInput.onchange=e=>{
   const r=new FileReader();
@@ -188,13 +210,14 @@ imgInput.onchange=e=>{
 
 createBtn.onclick=()=>{
   if(!imageData){alert("Upload image");return;}
-  startPuzzle(+piecesCount.value);
+  startGame(+piecesCount.value);
   tabs[1].click();
 };
 
-function startPuzzle(count){
-  board.innerHTML=""; pieces.innerHTML="";
-  timer=0; timerEl.textContent="00:00";
+function startGame(count){
+  const canvas=document.getElementById("canvas");
+  canvas.innerHTML="";
+  timer=0;
   clearInterval(interval);
   interval=setInterval(()=>{
     timer++;
@@ -204,29 +227,34 @@ function startPuzzle(count){
   },1000);
 
   const size=Math.round(Math.sqrt(count));
-  board.style.gridTemplateColumns=`repeat(${size},1fr)`;
-  pieces.style.gridTemplateColumns=`repeat(${size},1fr)`;
+  const pieceSize=canvas.clientWidth/size;
 
   for(let i=0;i<size*size;i++){
-    const s=document.createElement("div");
-    s.className="slot";
-    s.ondragover=e=>e.preventDefault();
-    s.ondrop=e=>{
-      const id=e.dataTransfer.getData("id");
-      if(id)s.appendChild(document.getElementById(id));
-    };
-    board.appendChild(s);
-
     const p=document.createElement("div");
     p.className="piece";
-    p.id="p"+i;
-    p.draggable=true;
+    p.style.width=p.style.height=pieceSize+"px";
     p.style.backgroundImage=`url(${imageData})`;
     p.style.backgroundSize=`${size*100}% ${size*100}%`;
     p.style.backgroundPosition=
       `${(i%size)*-100}% ${Math.floor(i/size)*-100}%`;
-    p.ondragstart=e=>e.dataTransfer.setData("id",p.id);
-    pieces.appendChild(p);
+
+    p.style.left=Math.random()*(canvas.clientWidth-pieceSize)+"px";
+    p.style.top=Math.random()*(canvas.clientHeight-pieceSize)+"px";
+
+    p.onmousedown=e=>{
+      const shiftX=e.offsetX, shiftY=e.offsetY;
+      p.style.zIndex=1000;
+      function move(ev){
+        p.style.left=ev.pageX-canvas.offsetLeft-shiftX+"px";
+        p.style.top=ev.pageY-canvas.offsetTop-shiftY+"px";
+      }
+      document.addEventListener("mousemove",move);
+      document.onmouseup=()=>{
+        document.removeEventListener("mousemove",move);
+        document.onmouseup=null;
+      };
+    };
+    canvas.appendChild(p);
   }
 }
 
@@ -236,10 +264,5 @@ showImage.onclick=()=>{
 };
 </script>
 
-</body>
-</html>
-
-
-<script src="script.js?v=1"></script>
 </body>
 </html>
