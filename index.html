@@ -17,7 +17,7 @@ body{
     linear-gradient(180deg,#0b0616,#140a24);
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 header{
   display:flex;
   justify-content:space-between;
@@ -36,7 +36,7 @@ nav button{
 }
 nav button.active{background:#9f6cff}
 
-/* ===== LAYOUT ===== */
+/* LAYOUT */
 main{
   max-width:1200px;
   margin:30px auto;
@@ -45,22 +45,21 @@ main{
 section{display:none}
 section.active{display:block}
 
-/* ===== CARD ===== */
+/* CARD */
 .card{
-  max-width:700px;
+  max-width:720px;
   margin:0 auto;
   background:rgba(0,0,0,.4);
   border:1px solid rgba(255,255,255,.15);
   border-radius:18px;
-  padding:20px;
+  padding:22px;
 }
 
-/* ===== FORM ===== */
-label{display:block;margin-bottom:6px;opacity:.9}
+/* FORM */
+label{display:block;margin:12px 0 6px}
 input,select{
   width:100%;
-  padding:10px;
-  margin-bottom:14px;
+  padding:12px;
   border-radius:10px;
   border:1px solid rgba(255,255,255,.2);
   background:#000;
@@ -70,6 +69,7 @@ input,select{
   display:flex;
   justify-content:flex-end;
   gap:10px;
+  margin-top:16px;
 }
 button{
   padding:10px 18px;
@@ -80,17 +80,31 @@ button{
   cursor:pointer;
 }
 .primary{background:#9f6cff}
+button:disabled{opacity:.5;cursor:not-allowed}
 
-/* ===== GAME ===== */
-.game-wrap{
-  position:relative;
-  width:100%;
-  max-width:900px;
-  margin:0 auto;
+/* PREVIEW */
+.preview{
+  margin-top:14px;
+  display:none;
+}
+.preview img{
+  max-width:100%;
+  border-radius:14px;
+  border:2px solid rgba(255,255,255,.2);
+}
+
+/* GAME */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
 }
 .canvas{
   position:relative;
   width:100%;
+  max-width:900px;
+  margin:0 auto;
   aspect-ratio:1/1;
   background:rgba(0,0,0,.35);
   border:2px dashed rgba(255,255,255,.3);
@@ -104,15 +118,7 @@ button{
   border-radius:6px;
 }
 
-/* ===== TOP BAR ===== */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:10px;
-}
-
-/* ===== MODAL ===== */
+/* MODAL */
 .modal{
   position:fixed;
   inset:0;
@@ -151,6 +157,10 @@ button{
     <label>Image</label>
     <input type="file" id="imgInput" accept="image/*">
 
+    <div class="preview" id="preview">
+      <img id="previewImg">
+    </div>
+
     <label>Puzzle name</label>
     <input id="puzzleName" placeholder="Untitled">
 
@@ -163,7 +173,7 @@ button{
 
     <div class="actions">
       <button id="cancelBtn">Cancel</button>
-      <button class="primary" id="createBtn">Create</button>
+      <button class="primary" id="createBtn" disabled>Create & Play</button>
     </div>
   </div>
 </section>
@@ -173,10 +183,7 @@ button{
     <div>⏱ <span id="timer">00:00</span></div>
     <button id="showImage">Image</button>
   </div>
-
-  <div class="game-wrap">
-    <div class="canvas" id="canvas"></div>
-  </div>
+  <div class="canvas" id="canvas"></div>
 </section>
 
 </main>
@@ -186,7 +193,6 @@ button{
 </div>
 
 <script>
-/* ===== TABS ===== */
 const tabs=document.querySelectorAll("nav button");
 const sections=document.querySelectorAll("section");
 tabs.forEach(b=>{
@@ -198,18 +204,23 @@ tabs.forEach(b=>{
   }
 });
 
-/* ===== GAME LOGIC ===== */
 let imageData=null;
 let timer=0, interval=null;
 
 imgInput.onchange=e=>{
+  const file=e.target.files[0];
+  if(!file) return;
   const r=new FileReader();
-  r.onload=()=>imageData=r.result;
-  r.readAsDataURL(e.target.files[0]);
+  r.onload=()=>{
+    imageData=r.result;
+    preview.style.display="block";
+    previewImg.src=imageData;
+    createBtn.disabled=false;
+  };
+  r.readAsDataURL(file);
 };
 
 createBtn.onclick=()=>{
-  if(!imageData){alert("Upload image");return;}
   startGame(+piecesCount.value);
   tabs[1].click();
 };
@@ -237,7 +248,6 @@ function startGame(count){
     p.style.backgroundSize=`${size*100}% ${size*100}%`;
     p.style.backgroundPosition=
       `${(i%size)*-100}% ${Math.floor(i/size)*-100}%`;
-
     p.style.left=Math.random()*(canvas.clientWidth-pieceSize)+"px";
     p.style.top=Math.random()*(canvas.clientHeight-pieceSize)+"px";
 
