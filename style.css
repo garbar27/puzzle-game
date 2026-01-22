@@ -1,46 +1,199 @@
-* {
-  box-sizing: border-box;
-  user-select: none;
-}
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Puzzle Game</title>
+  <link rel="stylesheet" href="./style.css" />
 
-body {
-  margin: 0;
-  font-family: sans-serif;
-  background: radial-gradient(circle at top, #3b1c5a, #0b0815);
-  color: white;
-  text-align: center;
-}
+  <!-- Konva (рендер) -->
+  <script src="https://unpkg.com/konva@9/konva.min.js"></script>
+  <!-- Headbreaker (jigsaw + snap + автогенерація) -->
+  <script src="https://flbulgarelli.github.io/headbreaker/js/headbreaker.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🧩</span>
+      <span class="brand-name">Puzzle Game</span>
+    </div>
 
-header {
-  padding: 16px;
-}
+    <nav class="nav">
+      <button class="nav-btn" data-route="create">Create</button>
+      <button class="nav-btn" data-route="play">Play</button>
+      <button class="nav-btn" data-route="mypuzzles">My Puzzles</button>
+    </nav>
+  </header>
 
-#controls {
-  margin: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
+  <main class="shell">
+    <!-- CREATE -->
+    <section id="page-create" class="page">
+      <div class="card big">
+        <div class="card-head">
+          <h1>Create Puzzle</h1>
+          <p class="muted">
+            Завантаж фото, задай назву, видимість і кількість частинок — і одразу починай гру.
+          </p>
+        </div>
 
-#board {
-  width: 420px;
-  height: 420px;
-  margin: 20px auto;
-  background: #222;
-  position: relative;
-  border-radius: 12px;
-}
+        <div class="grid-2">
+          <div class="block">
+            <label class="label">Image</label>
 
-.piece {
-  position: absolute;
-  cursor: grab;
-}
+            <div id="dropzone" class="dropzone" tabindex="0">
+              <div class="dz-title">Перетягни фото сюди або клікни, щоб завантажити</div>
+              <div class="dz-sub muted">PNG/JPG/WebP. Рекомендовано до ~3–5MB.</div>
+              <input id="fileInput" class="dz-input" type="file" accept="image/*" />
+            </div>
 
-.piece.locked {
-  cursor: default;
-}
+            <div class="row gap">
+              <button id="useDemo" class="btn ghost">Use demo image</button>
+              <button id="removeImage" class="btn ghost danger">Remove</button>
+            </div>
 
-#leaderboard {
-  list-style: none;
-  padding: 0;
-}
+            <div class="preview-wrap">
+              <div class="label muted">Preview</div>
+              <img id="imgPreview" class="preview" alt="preview" />
+            </div>
+
+            <div class="help muted">
+              ⚠️ Private/Link-only на GitHub Pages працює як “локальне збереження в браузері”.
+              На іншому пристрої цього пазла не буде, якщо ти не перенесеш дані (це версія без бекенду).
+            </div>
+          </div>
+
+          <div class="block">
+            <label class="label">Puzzle name</label>
+            <input id="puzzleName" class="input" type="text" placeholder="Напр. My Magic Puzzle" />
+
+            <div class="spacer"></div>
+
+            <label class="label">Visibility</label>
+            <select id="visibility" class="select">
+              <option value="public">Public</option>
+              <option value="link">Anyone with the link</option>
+              <option value="private">Private</option>
+            </select>
+
+            <div class="spacer"></div>
+
+            <label class="label">Pieces</label>
+            <select id="piecesCount" class="select">
+              <option>10</option><option>20</option><option>32</option><option>48</option>
+              <option selected>64</option><option>72</option><option>90</option><option>100</option>
+              <option>120</option><option>140</option><option>164</option><option>180</option><option>200</option>
+            </select>
+
+            <div class="help muted">
+              Кількість = точне число частинок. Розкладка (ряди/колонки) підбирається автоматично під фото.
+            </div>
+
+            <div class="spacer"></div>
+
+            <div class="row right gap">
+              <button id="cancelCreate" class="btn ghost">Cancel</button>
+              <button id="createAndPlay" class="btn primary">Create &amp; Play</button>
+            </div>
+
+            <div class="spacer"></div>
+
+            <label class="label">Share link</label>
+            <div class="row gap">
+              <input id="shareLink" class="input" type="text" readonly />
+              <button id="copyLink" class="btn ghost">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAY -->
+    <section id="page-play" class="page">
+      <div class="play-head">
+        <div>
+          <h1 id="playTitle">Play</h1>
+          <div class="timer">
+            <span class="timer-ic">⏱</span>
+            <span id="timerText">00:00</span>
+          </div>
+        </div>
+
+        <div class="row gap">
+          <button id="btnImage" class="btn ghost">Image</button>
+          <button id="btnShuffle" class="btn ghost">Shuffle</button>
+          <button id="btnBack" class="btn ghost">Back</button>
+        </div>
+      </div>
+
+      <div class="play-grid">
+        <div class="stage-card">
+          <div class="stage-title muted">Puzzle board</div>
+          <div id="puzzleHost" class="puzzle-host"></div>
+        </div>
+
+        <div class="side-card">
+          <div class="stage-title muted">Leaderboard</div>
+          <div class="muted small">Записується найкращий час для кожного імені (localStorage).</div>
+          <div id="leaderboard" class="leaderboard"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MY PUZZLES -->
+    <section id="page-mypuzzles" class="page">
+      <div class="card">
+        <div class="card-head">
+          <h1>My Puzzles</h1>
+          <p class="muted">Список збережених пазлів у твоєму браузері.</p>
+        </div>
+        <div id="myPuzzlesList" class="list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- IMAGE MODAL -->
+  <div id="imgModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">Reference image</div>
+        <button class="modal-close" data-close="1">✕</button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImg" alt="reference" />
+      </div>
+    </div>
+  </div>
+
+  <!-- WIN MODAL -->
+  <div id="winModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">✅ Puzzle completed!</div>
+        <button class="modal-close" id="winClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="win-row">
+          <div class="muted">Your time</div>
+          <div id="winTime" class="win-time">00:00</div>
+        </div>
+        <div class="spacer"></div>
+        <label class="label">Your name</label>
+        <input id="playerName" class="input" type="text" placeholder="Напр. garbar27" />
+        <div class="spacer"></div>
+        <div class="row right gap">
+          <button id="playAgain" class="btn ghost">Play again</button>
+          <button id="saveScore" class="btn primary">Save to leaderboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer muted">
+    Made for GitHub Pages • працює без бекенду (localStorage)
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
