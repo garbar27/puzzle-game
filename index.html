@@ -1,193 +1,61 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
   <title>Puzzle Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Headbreaker (jigsaw puzzle engine) -->
-  <script src="https://flbulgarelli.github.io/headbreaker/js/headbreaker.js"></script>
 </head>
-
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo">🧩</span>
-      <span class="title">Puzzle Game</span>
-    </div>
 
-    <nav class="nav">
-      <button class="navBtn" data-view="create">Create</button>
-      <button class="navBtn" data-view="play">Play</button>
-      <button class="navBtn" data-view="mypuzzles">My Puzzles</button>
-    </nav>
-  </header>
+<header>
+  <div class="logo">🧩 Puzzle Game</div>
+  <nav>
+    <button id="btnCreate" class="active">Create</button>
+    <button id="btnPlay">Play</button>
+  </nav>
+</header>
 
-  <main class="page">
-    <!-- CREATE -->
-    <section id="view-create" class="view">
-      <div class="card">
-        <h1>Create Puzzle</h1>
-        <p class="muted">Завантаж фото, задай назву, видимість і кількість частин — та починай гру.</p>
+<main>
 
-        <div class="formGrid">
-          <div class="field">
-            <label>Image</label>
-            <div class="upload">
-              <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" />
-              <div class="uploadHelp">
-                PNG/JPG/WebP • рекомендовано до ~3–5MB
-              </div>
-              <div class="uploadActions">
-                <button id="useDemoBtn" class="btn secondary" type="button">Use demo image</button>
-                <button id="removeImgBtn" class="btn ghost" type="button">Remove</button>
-              </div>
-            </div>
+<section id="createSection" class="active">
+  <div class="card">
+    <h2>Create Puzzle</h2>
 
-            <div class="previewWrap">
-              <div class="previewTitle">Preview</div>
-              <img id="imgPreview" class="previewImg" alt="preview" />
-            </div>
-          </div>
+    <label>Image</label>
+    <input type="file" id="imageInput" accept="image/*" />
 
-          <div class="field">
-            <label>Puzzle name</label>
-            <input id="puzzleName" class="input" type="text" placeholder="Напр. My Magic Puzzle" maxlength="60" />
-          </div>
+    <label>Puzzle name</label>
+    <input type="text" id="puzzleName" placeholder="Untitled" />
 
-          <div class="field">
-            <label>Visibility</label>
-            <select id="visibility" class="select">
-              <option value="public">Public</option>
-              <option value="link">Anyone with the link</option>
-              <option value="private">Private</option>
-            </select>
-            <div class="hint">
-              * На GitHub Pages це працює як “локальне збереження в браузері”.
-              “Link-only” ховає пазл без правильного токена у посиланні.
-            </div>
-          </div>
+    <label>Pieces</label>
+    <select id="piecesSelect">
+      <option value="16">16</option>
+      <option value="25">25</option>
+      <option value="36">36</option>
+      <option value="49">49</option>
+      <option value="64">64</option>
+    </select>
 
-          <div class="field">
-            <label>Pieces</label>
-            <select id="piecesCount" class="select">
-              <option>10</option><option>20</option><option>32</option><option selected>48</option>
-              <option>64</option><option>72</option><option>90</option><option>100</option>
-              <option>120</option><option>140</option><option>164</option><option>180</option><option>200</option>
-            </select>
-            <div class="hint">
-              Кількість частин = точне число пазлинок. Розклад (ряди/колонки) підбирається автоматично.
-            </div>
-          </div>
-        </div>
+    <button id="startGameBtn" class="primary">Create & Play</button>
+  </div>
+</section>
 
-        <div class="actionsRow">
-          <button id="cancelCreateBtn" class="btn ghost" type="button">Cancel</button>
-          <button id="createPlayBtn" class="btn primary" type="button">Create &amp; Play</button>
-        </div>
+<section id="playSection">
+  <div class="topbar">
+    <div>⏱ <span id="timer">00:00</span></div>
+    <button id="showImageBtn">Image</button>
+  </div>
 
-        <div class="shareBox" id="shareBox">
-          <div class="shareTitle">Share link</div>
-          <div class="shareRow">
-            <input id="shareLink" class="input" type="text" readonly />
-            <button id="copyLinkBtn" class="btn secondary" type="button">Copy</button>
-          </div>
-        </div>
-      </div>
-    </section>
+  <div id="board"></div>
+</section>
 
-    <!-- PLAY -->
-    <section id="view-play" class="view hidden">
-      <div class="playTop">
-        <div class="playInfo">
-          <div class="playTitle" id="playTitle">Play</div>
-          <div class="timer">
-            <span class="timerIcon">⏱</span>
-            <span id="timerText">00:00</span>
-          </div>
-        </div>
+<div id="imageModal">
+  <img id="fullImage" />
+</div>
 
-        <div class="playButtons">
-          <button id="toggleImageBtn" class="btn secondary" type="button">Image</button>
-          <button id="shuffleBtn" class="btn ghost" type="button">Shuffle</button>
-          <button id="backToCreateBtn" class="btn ghost" type="button">Back</button>
-        </div>
-      </div>
+</main>
 
-      <div class="stageWrap">
-        <!-- faint target frame -->
-        <div class="targetFrame" id="targetFrame"></div>
-
-        <!-- headbreaker renders here -->
-        <div id="puzzleStage" class="puzzleStage"></div>
-
-        <!-- image overlay -->
-        <div id="imageOverlay" class="overlay hidden">
-          <div class="overlayCard">
-            <div class="overlayHead">
-              <div class="overlayTitle">Final image</div>
-              <button id="closeOverlayBtn" class="btn ghost" type="button">Close</button>
-            </div>
-            <img id="finalImage" class="finalImage" alt="final" />
-          </div>
-        </div>
-
-        <!-- solved modal -->
-        <div id="solvedOverlay" class="overlay hidden">
-          <div class="overlayCard">
-            <div class="overlayHead">
-              <div class="overlayTitle">Puzzle completed! 🎉</div>
-              <button id="closeSolvedBtn" class="btn ghost" type="button">Close</button>
-            </div>
-
-            <div class="solvedBody">
-              <div class="solvedRow">
-                <div class="muted">Your time</div>
-                <div class="big" id="solvedTime">00:00</div>
-              </div>
-
-              <div class="field" style="margin-top:12px;">
-                <label>Your name</label>
-                <input id="playerName" class="input" type="text" placeholder="Напр. Garbar" maxlength="32" />
-              </div>
-
-              <div class="actionsRow" style="margin-top:12px;">
-                <button id="saveScoreBtn" class="btn primary" type="button">Save to leaderboard</button>
-                <button id="playAgainBtn" class="btn secondary" type="button">Play again</button>
-              </div>
-
-              <div class="hint" style="margin-top:10px;">
-                Записується лише найкращий результат для твого імені (якщо покращиш — оновиться).
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="below">
-        <div class="card">
-          <h2>Leaderboard</h2>
-          <div class="muted" id="lbHint">Топ результатів (локально у твоєму браузері).</div>
-          <div id="leaderboard" class="leaderboard"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MY PUZZLES -->
-    <section id="view-mypuzzles" class="view hidden">
-      <div class="card">
-        <h1>My Puzzles</h1>
-        <p class="muted">Список збережених пазлів у цьому браузері.</p>
-        <div id="puzzlesList" class="puzzlesList"></div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <span class="muted">Made for GitHub Pages • працює без бекенду (localStorage)</span>
-  </footer>
-
-  <script src="app.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
