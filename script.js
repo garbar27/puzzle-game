@@ -108,10 +108,13 @@ function formatTime(ms){
 }
 
 function openModal(modal){
+  document.body.classList.add("modal-open");
   modal.classList.remove("hidden");
   modal.setAttribute("aria-hidden", "false");
 }
+
 function closeModal(modal){
+  document.body.classList.remove("modal-open");
   modal.classList.add("hidden");
   modal.setAttribute("aria-hidden", "true");
 }
