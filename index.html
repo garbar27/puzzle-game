@@ -1,60 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- ВАЖЛИВО для GitHub Pages -->
-  <base href="/puzzle-game/">
-
+  <meta charset="UTF-8" />
   <title>Puzzle Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
 
   <!-- Konva (canvas engine) -->
   <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 
-  <!-- Headbreaker (jigsaw engine) -->
+  <!-- Headbreaker (REAL jigsaw engine) -->
   <script src="https://flbulgarelli.github.io/headbreaker/js/headbreaker.js"></script>
 </head>
+
 <body>
+  <header>
+    <h1>🧩 Puzzle Game</h1>
+    <div id="timer">00:00</div>
+  </header>
 
-<header class="topbar">
-  <div class="brand">🧩 Puzzle Game</div>
-</header>
-
-<main class="app">
-
-  <section class="panel">
-    <h2>Create & Play</h2>
-
+  <section class="controls">
     <input type="file" id="imageInput" accept="image/*">
+remember this
     <select id="pieces">
       <option value="16">16</option>
       <option value="25">25</option>
-      <option value="36">36</option>
-      <option value="64" selected>64</option>
-      <option value="100">100</option>
+      <option value="36" selected>36</option>
+      <option value="49">49</option>
     </select>
 
     <button id="startBtn">Create & Play</button>
-
-    <div class="timer">
-      ⏱ <span id="time">00:00</span>
-    </div>
   </section>
 
-  <section class="game">
-    <div id="puzzle"></div>
-  </section>
+  <main>
+    <div id="canvas"></div>
+  </main>
 
   <section class="leaderboard">
-    <h3>Leaderboard</h3>
-    <ul id="scores"></ul>
+    <h2>Leaderboard</h2>
+    <ol id="scores"></ol>
   </section>
 
-</main>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
+
