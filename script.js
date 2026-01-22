@@ -9,6 +9,7 @@ let timer = null;
 let seconds = 0;
 let started = false;
 
+/* ---------- TIMER ---------- */
 function startTimer() {
   if (timer) return;
   timer = setInterval(() => {
@@ -24,6 +25,7 @@ function stopTimer() {
   timer = null;
 }
 
+/* ---------- LEADERBOARD ---------- */
 function saveScore(sec) {
   const scores = JSON.parse(localStorage.getItem("scores") || "[]");
   scores.push(sec);
@@ -37,14 +39,16 @@ function renderScores() {
   const scores = JSON.parse(localStorage.getItem("scores") || "[]");
   scores.forEach(s => {
     const li = document.createElement("li");
-    li.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2,"0")}`;
+    li.textContent =
+      `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
     scoresEl.appendChild(li);
   });
 }
 
 renderScores();
 
-startBtn.onclick = async () => {
+/* ---------- MAIN ---------- */
+startBtn.onclick = () => {
   puzzleEl.innerHTML = "";
   stopTimer();
   seconds = 0;
@@ -58,49 +62,43 @@ startBtn.onclick = async () => {
     ? URL.createObjectURL(file)
     : "puzzle.jpg";
 
-  await img.decode();
+  /* 🔴 ВАЖЛИВО: ЧЕКАЄМО ЗАВАНТАЖЕННЯ */
+  img.onload = () => {
+    const pieceCount = Number(piecesSelect.value);
+    const grid = Math.round(Math.sqrt(pieceCount));
 
-  const stage = new Konva.Stage({
-    container: "puzzle",
-    width: 600,
-    height: 600
-  });
+    const puzzle = new headbreaker.Canvas("puzzle", {
+      width: 600,
+      height: 600,
+      image: img,
+      pieceSize: 600 / grid,
+      proximity: 20,
+      borderFill: 10,
+      strokeWidth: 1,
+      lineSoftness: 0.18
+    });
 
-  const layer = new Konva.Layer();
-  stage.add(layer);
+    puzzle.autogenerate({
+      horizontalPiecesCount: grid,
+      verticalPiecesCount: grid
+    });
 
-  const puzzle = new headbreaker.Canvas("puzzle", {
-    width: 600,
-    height: 600,
-    pieceSize: Math.sqrt((600 * 600) / piecesSelect.value),
-    proximity: 20,
-    borderFill: 10,
-    strokeWidth: 1,
-    lineSoftness: 0.18,
-    image: img,
-  });
+    puzzle.shuffle();
+    puzzle.attachSolvedValidator();
 
-  puzzle.autogenerate({
-    horizontalPiecesCount: Math.round(Math.sqrt(piecesSelect.value)),
-    verticalPiecesCount: Math.round(Math.sqrt(piecesSelect.value))
-  });
+    puzzle.on("piece-moved", () => {
+      if (!started) {
+        started = true;
+        startTimer();
+      }
+    });
 
-  puzzle.shuffle();
+    puzzle.on("solved", () => {
+      stopTimer();
+      saveScore(seconds);
+      alert("🧩 Puzzle completed!");
+    });
 
-  puzzle.attachSolvedValidator();
-
-  puzzle.on("piece-moved", () => {
-    if (!started) {
-      started = true;
-      startTimer();
-    }
-  });
-
-  puzzle.on("solved", () => {
-    stopTimer();
-    saveScore(seconds);
-    alert("🧩 Puzzle completed!");
-  });
-
-  puzzle.draw();
+    puzzle.draw();
+  };
 };
