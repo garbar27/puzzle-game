@@ -1,60 +1,143 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Puzzle Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
 
-<header>
-  <div class="logo">🧩 Puzzle Game</div>
-  <nav>
-    <button id="btnCreate" class="active">Create</button>
-    <button id="btnPlay">Play</button>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">🧩</span>
+    <span class="title">Puzzle Game</span>
+  </div>
+
+  <nav class="nav">
+    <button class="navBtn active" data-tab="create">Create</button>
+    <button class="navBtn" data-tab="play">Play</button>
   </nav>
 </header>
 
-<main>
+<main class="page">
+  <!-- CREATE -->
+  <section id="tab-create" class="tab active">
+    <div class="card">
+      <h1>Create Puzzle</h1>
+      <p class="muted">Завантаж фото → обери кількість частин → Start.</p>
 
-<section id="createSection" class="active">
-  <div class="card">
-    <h2>Create Puzzle</h2>
+      <div class="grid">
+        <div class="field">
+          <label>Image</label>
+          <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" />
+          <div class="row">
+            <button id="demoBtn" class="btn secondary" type="button">Use demo image</button>
+            <button id="clearBtn" class="btn ghost" type="button">Remove</button>
+          </div>
+          <div class="previewWrap">
+            <div class="labelSmall">Preview</div>
+            <img id="previewImg" alt="preview" />
+          </div>
+        </div>
 
-    <label>Image</label>
-    <input type="file" id="imageInput" accept="image/*" />
+        <div class="field">
+          <label>Puzzle name</label>
+          <input id="puzzleName" class="input" type="text" placeholder="Untitled" maxlength="50" />
+        </div>
 
-    <label>Puzzle name</label>
-    <input type="text" id="puzzleName" placeholder="Untitled" />
+        <div class="field">
+          <label>Pieces</label>
+          <select id="piecesSelect" class="select">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="32">32</option>
+            <option value="48" selected>48</option>
+            <option value="64">64</option>
+            <option value="72">72</option>
+            <option value="90">90</option>
+            <option value="100">100</option>
+            <option value="120">120</option>
+            <option value="140">140</option>
+            <option value="164">164</option>
+            <option value="180">180</option>
+            <option value="200">200</option>
+          </select>
+          <div class="hint">Ми автоматично підбираємо ряди/колонки під цю кількість.</div>
+        </div>
+      </div>
 
-    <label>Pieces</label>
-    <select id="piecesSelect">
-      <option value="16">16</option>
-      <option value="25">25</option>
-      <option value="36">36</option>
-      <option value="49">49</option>
-      <option value="64">64</option>
-    </select>
+      <div class="actions">
+        <button id="startBtn" class="btn primary" type="button">Create & Play</button>
+      </div>
+    </div>
+  </section>
 
-    <button id="startGameBtn" class="primary">Create & Play</button>
+  <!-- PLAY -->
+  <section id="tab-play" class="tab">
+    <div class="playTop">
+      <div>
+        <div class="playTitle" id="playTitle">Play</div>
+        <div class="timer">⏱ <span id="timerText">00:00</span></div>
+      </div>
+
+      <div class="playBtns">
+        <button id="imageBtn" class="btn secondary" type="button">Image</button>
+        <button id="shuffleBtn" class="btn ghost" type="button">Shuffle</button>
+        <button id="backBtn" class="btn ghost" type="button">Back</button>
+      </div>
+    </div>
+
+    <div class="boardWrap">
+      <div class="board" id="board"></div>
+      <div class="tray" id="tray"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h2>Leaderboard</h2>
+      <div class="muted">Записується найкращий час для кожного імені (localStorage).</div>
+      <div id="leaderboard" class="leaderboard"></div>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL: Final Image -->
+<div id="modal" class="modal">
+  <div class="modalCard">
+    <div class="modalHead">
+      <div class="modalTitle">Final image</div>
+      <button id="closeModal" class="btn ghost" type="button">Close</button>
+    </div>
+    <img id="finalImg" alt="final" />
   </div>
-</section>
-
-<section id="playSection">
-  <div class="topbar">
-    <div>⏱ <span id="timer">00:00</span></div>
-    <button id="showImageBtn">Image</button>
-  </div>
-
-  <div id="board"></div>
-</section>
-
-<div id="imageModal">
-  <img id="fullImage" />
 </div>
 
-</main>
+<!-- MODAL: Solved -->
+<div id="solved" class="modal">
+  <div class="modalCard">
+    <div class="modalHead">
+      <div class="modalTitle">Puzzle completed! 🎉</div>
+      <button id="closeSolved" class="btn ghost" type="button">Close</button>
+    </div>
+
+    <div class="solvedBody">
+      <div class="solvedRow">
+        <div class="muted">Your time</div>
+        <div class="big" id="solvedTime">00:00</div>
+      </div>
+
+      <label style="margin-top:10px;">Your name</label>
+      <input id="playerName" class="input" type="text" placeholder="Напр. Garbar" maxlength="32" />
+
+      <div class="actions">
+        <button id="saveScore" class="btn primary" type="button">Save score</button>
+        <button id="playAgain" class="btn secondary" type="button">Play again</button>
+      </div>
+
+      <div class="hint">Якщо ти покращиш результат — він оновиться.</div>
+    </div>
+  </div>
+</div>
 
 <script src="script.js"></script>
 </body>
